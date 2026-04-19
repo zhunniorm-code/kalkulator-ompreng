@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Kalkulator Ompreng</title>
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: Arial;
+  color: white;
+  text-align: center;
+}
+
+body {
+  background: linear-gradient(to bottom, #ff0000 50%, #ffffff 50%);
+}
+
+#emoji-bg {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+}
+
+.emoji {
+  position: absolute;
+  opacity: 0.65;
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+  animation: float 4s ease-in-out infinite;
+}
+
+.headline-box {
+  position: absolute;
+  top: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.6);
+  padding: 12px 20px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.overlay {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.box {
+  background: rgba(0,0,0,0.8);
+  padding: 25px;
+  border-radius: 16px;
+  width: 330px;
+}
+
+input, button {
+  padding: 10px;
+  margin: 10px;
+  width: 85%;
+  border-radius: 8px;
+  border: none;
+}
+
+button {
+  background: #22c55e;
+  color: white;
+  font-weight: bold;
+}
+
+.petunjuk {
+  margin-top: 15px;
+  width: 330px;
+  background: rgba(0,0,0,0.8);
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  background: rgba(0,0,0,0.9);
+  padding: 10px 0;
+  font-family: monospace;
+  text-transform: uppercase;
+}
+
+.footer div { width: 33%; }
+
+.watermark {
+  position: fixed;
+  bottom: 50px;
+  right: 15px;
+  background: rgba(0,0,0,0.7);
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="emoji-bg"></div>
+
+<div class="headline-box">
+  KELIHATAN BANYAK, TAPI KUAT BERAPA LAMA?
+</div>
+
+<div class="overlay">
+
+  <div class="box">
+    <input type="text" id="uang" placeholder="Rp 0">
+    <p id="terbilang"></p>
+
+    <button onclick="hitung()">HITUNG</button>
+
+    <h3 id="hasil"></h3>
+    <h4 id="hari"></h4>
+  </div>
+
+  <div class="petunjuk">
+    Masukkan uang → lihat jadi berapa ompreng → dan berapa lama cukup buat Indonesia.
+  </div>
+
+</div>
+
+<div class="watermark">MEEZWART</div>
+
+<div class="footer">
+  <div>HITUNG DUIT</div>
+  <div>SELAMAT BERHITUNG</div>
+  <div>OMPRENG LIFE</div>
+</div>
+
+<script>
+const hargaOmpreng = 10000;
+const penduduk = 270000000;
+
+function formatAngka(num) {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+/* TERBILANG SAMPAI GOOGOL */
+function terbilangSimple(num) {
+  num = Number(num);
+  if (num < 1000) return num + " perak";
+
+  const satuan = [
+    { nilai: 1e100, nama: "googol" },
+    { nilai: 1e33, nama: "desiliun" },
+    { nilai: 1e30, nama: "noniliun" },
+    { nilai: 1e27, nama: "oktiliun" },
+    { nilai: 1e24, nama: "septiliun" },
+    { nilai: 1e21, nama: "sekstiliun" },
+    { nilai: 1e18, nama: "kuintiliun" },
+    { nilai: 1e15, nama: "kuadriliun" },
+    { nilai: 1e12, nama: "triliun" },
+    { nilai: 1e9, nama: "miliar" },
+    { nilai: 1e6, nama: "juta" },
+    { nilai: 1e3, nama: "ribu" }
+  ];
+
+  for (let s of satuan) {
+    if (num >= s.nilai) {
+      return Math.floor(num / s.nilai) + " " + s.nama;
+    }
+  }
+}
+
+/* INPUT FORMAT */
+document.getElementById("uang").addEventListener("input", function(e) {
+  let value = e.target.value.replace(/\D/g, "");
+  e.target.value = formatAngka(value);
+
+  document.getElementById("terbilang").innerText =
+    value ? "= " + terbilangSimple(value) : "";
+});
+
+/* HITUNG */
+function hitung() {
+  let uang = document.getElementById("uang").value.replace(/\./g, "");
+  if (!uang) return;
+
+  let ompreng = Math.floor(uang / hargaOmpreng);
+  let hari = ompreng / penduduk;
+
+  let waktu;
+
+  if (hari >= 365) {
+    let tahun = Math.floor(hari / 365);
+    let sisaHari = Math.floor(hari % 365);
+    let totalHari = Math.floor(hari);
+
+    waktu = formatAngka(tahun) + " tahun";
+
+    if (sisaHari > 0) {
+      waktu += " " + formatAngka(sisaHari) + " hari";
+    }
+
+    waktu += " (≈ " + formatAngka(totalHari) + " hari)";
+    waktu += " (~ " + terbilangSimple(totalHari) + " hari)";
+  }
+  else if (hari >= 1) {
+    let totalHari = Math.floor(hari);
+    waktu = formatAngka(totalHari) + " hari";
+    waktu += " (~ " + terbilangSimple(totalHari) + " hari)";
+  }
+  else {
+    let jam = Math.floor(hari * 24);
+    let menit = Math.floor((hari * 24 - jam) * 60);
+    let detik = Math.floor((((hari * 24 - jam) * 60) - menit) * 60);
+    waktu = jam + " jam " + menit + " menit " + detik + " detik";
+  }
+
+  document.getElementById("hasil").innerText =
+    "Rp " + formatAngka(uang) + " = " +
+    formatAngka(ompreng) + " ompreng (~ " +
+    terbilangSimple(ompreng) + " ompreng)";
+
+  document.getElementById("hari").innerText =
+    "Cukup untuk " + waktu;
+}
+
+/* EMOJI */
+const emojis = ["🍱","💸","🇮🇩","💰","🌳","🍚"];
+
+for (let i = 0; i < 40; i++) {
+  let e = document.createElement("div");
+  e.className = "emoji";
+  e.innerText = emojis[Math.floor(Math.random()*emojis.length)];
+  e.style.left = Math.random()*100 + "vw";
+  e.style.top = Math.random()*100 + "vh";
+  e.style.fontSize = (18 + Math.random()*25) + "px";
+  document.getElementById("emoji-bg").appendChild(e);
+}
+</script>
+
+</body>
+</html>
